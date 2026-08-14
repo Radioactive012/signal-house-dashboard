@@ -1,9 +1,44 @@
-(() => {
+import { createClient } from '@supabase/supabase-js';
+
+(async () => {
   const { projects } = window.MASTERY_DATA;
   const STORAGE_KEY = "signal-house-mastery-v2";
   const blankState = () => ({ tasks: {}, passed: {} });
 
-  function loadState() {
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+  const useSupabase = supabaseUrl && supabaseKey && supabaseUrl !== "YOUR_SUPABASE_URL_HERE";
+  const supabase = useSupabase ? createClient(supabaseUrl, supabaseKey) : null;
+  let session = null;
+
+  if (supabase) {
+    const { data } = await supabase.auth.getSession();
+    session = data.session;
+    if (!session) {
+      const email = prompt("Enter your email for the cloud database (if new, it will create an account):");
+      const password = prompt("Enter a password:");
+      if (email && password) {
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+        if (signInError) {
+          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({ email, password });
+          if (signUpError) alert("Error: " + signUpError.message);
+          else session = signUpData.session;
+        } else {
+          session = signInData.session;
+        }
+      }
+    }
+  }
+
+  async function loadState() {
+    if (supabase && session) {
+      const { data, error } = await supabase.from('user_progress').select('*').eq('user_id', session.user.id).single();
+      if (data) return { tasks: data.tasks || {}, passed: data.passed || {} };
+      if (error && error.code === 'PGRST116') {
+         await supabase.from('user_progress').insert({ user_id: session.user.id, tasks: {}, passed: {} });
+         return blankState();
+      }
+    }
     try {
       const stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
       const migrated = { ...blankState(), ...(stored || {}) };
@@ -12,12 +47,17 @@
     } catch { return blankState(); }
   }
 
-  let state = loadState();
+  let state = await loadState();
   const $ = (selector) => document.querySelector(selector);
   const esc = (value) => String(value).replace(/[&<>"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[char]);
   const currentIndex = () => Math.max(0, projects.findIndex((project) => !state.passed[project.id]));
   const currentProject = () => projects[currentIndex()] || projects.at(-1);
-  const save = () => localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  const save = () => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    if (supabase && session) {
+      supabase.from('user_progress').update({ tasks: state.tasks, passed: state.passed, updated_at: new Date().toISOString() }).eq('user_id', session.user.id).then();
+    }
+  };
   
   const allTasksDone = (project) => project.subprojects.every((sp, spIdx) => 
     sp.buildTasks.every((_, tIdx) => state.tasks[`${project.id}:sp${spIdx}:b${tIdx}`]) &&
