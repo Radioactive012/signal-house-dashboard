@@ -54,9 +54,9 @@ a { color: inherit; }
 .sync-status[data-state="saved"] { color: var(--green); }
 .sync-status[data-state="saving"] { color: var(--orange); }
 .sync-status[data-state="offline"], .sync-status[data-state="error"] { color: var(--orange); }
-.theme-toggle, .reset-button { border: 1px solid var(--line); padding: 8px 10px; color: var(--ink); background: transparent; font: 500 10px var(--mono); transition: all 0.2s; }
-.theme-toggle:hover, .reset-button:hover { background: var(--ink); color: var(--paper); }
-[data-theme="dark"] .theme-toggle:hover, [data-theme="dark"] .reset-button:hover { color: var(--acid); }
+.theme-toggle, .reset-button, .logout-button { border: 1px solid var(--line); padding: 8px 10px; color: var(--ink); background: transparent; font: 500 10px var(--mono); transition: all 0.2s; }
+.theme-toggle:hover, .reset-button:hover, .logout-button:hover { background: var(--ink); color: var(--paper); }
+[data-theme="dark"] .theme-toggle:hover, [data-theme="dark"] .reset-button:hover, [data-theme="dark"] .logout-button:hover { color: var(--acid); }
 
 .hero { padding: 92px 0 56px; }
 .kicker { color: var(--orange); }

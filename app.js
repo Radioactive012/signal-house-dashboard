@@ -9,7 +9,14 @@ import { createClient } from '@supabase/supabase-js';
   const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
   const isConfigured = Boolean(supabaseUrl && supabaseKey);
   const isLocalPreview = import.meta.env.VITE_DEV_BYPASS_AUTH === true && ["localhost", "127.0.0.1"].includes(window.location.hostname);
-  const supabase = isConfigured ? createClient(supabaseUrl, supabaseKey) : null;
+  const supabase = isConfigured ? createClient(supabaseUrl, supabaseKey, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+      storageKey: "signal-house-auth"
+    }
+  }) : null;
   let session = null;
   let syncTimer = null;
   let saveInFlight = false;
@@ -46,6 +53,9 @@ import { createClient } from '@supabase/supabase-js';
       const { data, error } = await supabase.auth.getSession();
       if (error) throw error;
       session = data.session;
+      if (session && window.location.hash.includes("access_token")) {
+        window.history.replaceState({}, document.title, `${window.location.pathname}${window.location.search}`);
+      }
     } catch {
       showAccessScreen({ title: "Unable to verify your session", description: "Refresh the page and try again. Your private dashboard remains locked." });
       return;
@@ -112,6 +122,8 @@ import { createClient } from '@supabase/supabase-js';
 
   let state = await loadState();
   const $ = (selector) => document.querySelector(selector);
+  const logoutButton = $("#logoutButton");
+  logoutButton.hidden = isLocalPreview || !session;
   const esc = (value) => String(value).replace(/[&<>"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[char]);
   const currentIndex = () => Math.max(0, projects.findIndex((project) => !state.passed[project.id]));
   const currentProject = () => projects[currentIndex()] || projects.at(-1);
@@ -382,6 +394,20 @@ import { createClient } from '@supabase/supabase-js';
   $("#resetButton").addEventListener("click", () => $("#resetDialog").showModal());
   $("#resetDialog").addEventListener("close", () => {
     if ($("#resetDialog").returnValue === "confirm") { state = blankState(); save(); render(); }
+  });
+
+  logoutButton.addEventListener("click", async () => {
+    logoutButton.disabled = true;
+    logoutButton.textContent = "Signing out…";
+    const { error } = await supabase.auth.signOut({ scope: "local" });
+    if (error) {
+      logoutButton.disabled = false;
+      logoutButton.textContent = "Sign out";
+      setSyncStatus("Could not sign out — try again", "error");
+      return;
+    }
+    localStorage.removeItem(STORAGE_KEY);
+    window.location.assign(`${window.location.origin}/`);
   });
   
   // Theme toggle logic
