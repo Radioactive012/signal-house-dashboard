@@ -8,6 +8,7 @@ import { createClient } from '@supabase/supabase-js';
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
   const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
   const isConfigured = Boolean(supabaseUrl && supabaseKey);
+  const isLocalPreview = import.meta.env.VITE_DEV_BYPASS_AUTH === true && ["localhost", "127.0.0.1"].includes(window.location.hostname);
   const supabase = isConfigured ? createClient(supabaseUrl, supabaseKey) : null;
   let session = null;
   let syncTimer = null;
@@ -40,16 +41,18 @@ import { createClient } from '@supabase/supabase-js';
     return;
   }
 
-  try {
-    const { data, error } = await supabase.auth.getSession();
-    if (error) throw error;
-    session = data.session;
-  } catch {
-    showAccessScreen({ title: "Unable to verify your session", description: "Refresh the page and try again. Your private dashboard remains locked." });
-    return;
+  if (!isLocalPreview) {
+    try {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) throw error;
+      session = data.session;
+    } catch {
+      showAccessScreen({ title: "Unable to verify your session", description: "Refresh the page and try again. Your private dashboard remains locked." });
+      return;
+    }
   }
 
-  if (!session) {
+  if (!session && !isLocalPreview) {
     showAccessScreen({ title: "Signal House", description: "Access your private mastery dashboard.", signIn: true });
     document.getElementById("google-login-btn").addEventListener("click", async (event) => {
       const button = event.currentTarget;
@@ -86,6 +89,10 @@ import { createClient } from '@supabase/supabase-js';
 
   async function loadState() {
     const localState = readLocalState();
+    if (isLocalPreview) {
+      setSyncStatus("Local preview — cloud sync off", "offline");
+      return localState;
+    }
     try {
       const { data, error } = await supabase.from("user_progress").select("tasks, passed").eq("user_id", session.user.id).maybeSingle();
       if (error) throw error;
@@ -109,6 +116,10 @@ import { createClient } from '@supabase/supabase-js';
   const currentIndex = () => Math.max(0, projects.findIndex((project) => !state.passed[project.id]));
   const currentProject = () => projects[currentIndex()] || projects.at(-1);
   const syncCloudState = async () => {
+    if (isLocalPreview) {
+      setSyncStatus("Local preview — saved on this device", "offline");
+      return;
+    }
     if (saveInFlight) {
       saveQueued = true;
       return;
@@ -132,6 +143,10 @@ import { createClient } from '@supabase/supabase-js';
 
   const save = () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    if (isLocalPreview) {
+      setSyncStatus("Local preview — saved on this device", "offline");
+      return;
+    }
     if (syncTimer) clearTimeout(syncTimer);
     syncTimer = setTimeout(syncCloudState, 250);
   };
@@ -221,6 +236,10 @@ import { createClient } from '@supabase/supabase-js';
       </section>
     `;
 
+    const nextBuildTask = sp.buildTasks.find((_, index) => !state.tasks[`${project.id}:sp${activeSpIdx}:b${index}`]);
+    const nextFailureTest = sp.failureTests.find((_, index) => !state.tasks[`${project.id}:sp${activeSpIdx}:f${index}`]);
+    const nextAction = nextBuildTask || nextFailureTest || "Review the gate and pass this project.";
+
     $("#missionContent").innerHTML = `
       <div class="mission-shell ${isFinal ? "mission-complete" : ""}">
         <div class="mission-title">
@@ -235,6 +254,7 @@ import { createClient } from '@supabase/supabase-js';
         ${active ? `
         <div class="work-block">
           <div class="block-head"><p>Focus Mode</p><span>Project Progress: ${doneTasks}/${totalTasks}</span></div>
+          <div class="focus-callout"><span>Next action</span><strong>${esc(nextAction)}</strong></div>
         </div>
         ` : ""}
         ${active ? `

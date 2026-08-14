@@ -19,6 +19,7 @@ function normalizeSupabaseUrl(value) {
 const supabaseUrl = normalizeSupabaseUrl(process.env.VITE_SUPABASE_URL);
 const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY?.trim() || "";
 const requireSupabaseConfig = process.env.REQUIRE_SUPABASE_CONFIG !== "false";
+const enableLocalPreview = process.env.DEV_BYPASS_AUTH === "true";
 
 if (requireSupabaseConfig && (!supabaseUrl || !supabaseKey)) {
   throw new Error(
@@ -36,4 +37,5 @@ let appJs = await readFile(resolve(root, "app.js"), "utf8");
 appJs = appJs.replace(/import\s+\{.*\}\s+from\s+['"]@supabase\/supabase-js['"];?/, "import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';");
 appJs = appJs.replace(/import\.meta\.env\.VITE_SUPABASE_URL/g, JSON.stringify(supabaseUrl));
 appJs = appJs.replace(/import\.meta\.env\.VITE_SUPABASE_ANON_KEY/g, JSON.stringify(supabaseKey));
+appJs = appJs.replace(/import\.meta\.env\.VITE_DEV_BYPASS_AUTH/g, JSON.stringify(enableLocalPreview));
 await writeFile(resolve(destination, "app.js"), appJs);
