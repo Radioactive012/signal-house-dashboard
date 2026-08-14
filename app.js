@@ -15,18 +15,11 @@ import { createClient } from '@supabase/supabase-js';
     const { data } = await supabase.auth.getSession();
     session = data.session;
     if (!session) {
-      const email = prompt("Enter your email for the cloud database (if new, it will create an account):");
-      const password = prompt("Enter a password:");
-      if (email && password) {
-        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
-        if (signInError) {
-          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({ email, password });
-          if (signUpError) alert("Error: " + signUpError.message);
-          else session = signUpData.session;
-        } else {
-          session = signInData.session;
-        }
-      }
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+      });
+      if (error) console.error("Error logging in with Google:", error.message);
+      return; // Stop execution while redirecting
     }
   }
 
