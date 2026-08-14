@@ -11,8 +11,9 @@
     <div class="scanlines" aria-hidden="true"></div>
     <header class="masthead" id="top">
       <a class="wordmark" href="#top"><span class="sigil">S</span><span>Signal House</span></a>
-      <p class="masthead-note">n8n mastery field manual <span class="status-light"></span> local-first</p>
+      <p class="masthead-note">n8n mastery field manual <span class="status-light"></span> private sync</p>
       <div class="controls">
+        <span class="sync-status" id="syncStatus" role="status" aria-live="polite">Checking secure sync…</span>
         <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode">☾</button>
         <button class="reset-button" id="resetButton" type="button">Reset progress ↺</button>
       </div>
@@ -52,7 +53,7 @@
 
     </main>
 
-    <footer class="footer section-width"><p>Signal House / private learning system</p><p>Progress is stored only in this browser.</p></footer>
+    <footer class="footer section-width"><p>Signal House / private learning system</p><p>Progress syncs securely to your account.</p></footer>
 
     <dialog class="reset-dialog" id="resetDialog" aria-labelledby="resetTitle">
       <form method="dialog">

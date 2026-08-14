@@ -50,6 +50,10 @@ a { color: inherit; }
 .status-light { display: inline-block; width: 6px; height: 6px; margin-left: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 3px rgba(116,182,129,.17); }
 
 .controls { justify-self: end; display: flex; gap: 10px; align-items: center; }
+.sync-status { color: var(--muted); font: 500 9px var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+.sync-status[data-state="saved"] { color: var(--green); }
+.sync-status[data-state="saving"] { color: var(--orange); }
+.sync-status[data-state="offline"], .sync-status[data-state="error"] { color: var(--orange); }
 .theme-toggle, .reset-button { border: 1px solid var(--line); padding: 8px 10px; color: var(--ink); background: transparent; font: 500 10px var(--mono); transition: all 0.2s; }
 .theme-toggle:hover, .reset-button:hover { background: var(--ink); color: var(--paper); }
 [data-theme="dark"] .theme-toggle:hover, [data-theme="dark"] .reset-button:hover { color: var(--acid); }
@@ -169,23 +173,24 @@ a { color: inherit; }
 .login-overlay {
   position: fixed;
   top: 0; left: 0; width: 100vw; height: 100vh;
-  background: var(--bg);
+  background: rgba(16, 26, 25, .82);
+  backdrop-filter: blur(12px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--sans);
 }
 
 .login-card {
   background: var(--surface);
-  border: 1px solid var(--border);
+  border: 1px solid rgba(238,240,232,.24);
   padding: 40px;
-  border-radius: 20px;
+  border-radius: 16px;
   text-align: center;
   max-width: 400px;
   width: 90%;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  box-shadow: 0 24px 90px rgba(0,0,0,.32);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -199,18 +204,18 @@ a { color: inherit; }
 }
 
 .login-logo {
-  color: var(--primary);
+  color: var(--orange);
   margin-bottom: 10px;
 }
 
 .login-card h1 {
   font-size: 24px;
   margin: 0;
-  color: var(--text);
+  color: var(--ink);
 }
 
 .login-card p {
-  color: var(--text-muted);
+  color: var(--muted);
   margin: 0 0 20px 0;
   font-size: 14px;
 }
@@ -223,9 +228,9 @@ a { color: inherit; }
   width: 100%;
   padding: 12px;
   border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--bg);
-  color: var(--text);
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
   font-size: 15px;
   font-weight: 500;
   cursor: pointer;
@@ -233,7 +238,11 @@ a { color: inherit; }
 }
 
 .google-btn:hover {
-  background: var(--surface-hover);
+  background: var(--acid);
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(0,0,0,0.05);
 }
+
+.google-btn:disabled { cursor: wait; opacity: .7; transform: none; }
+.login-error { min-height: 1.4em; margin: 0 !important; color: var(--orange) !important; }
+@media (max-width:560px) { .sync-status { display:none; } }

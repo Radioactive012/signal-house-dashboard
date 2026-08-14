@@ -2,7 +2,7 @@
 node_modules/
 .next/
 .wrangler/
-public/field-manual/
+public/
 .env
 .env.local
 dist/
