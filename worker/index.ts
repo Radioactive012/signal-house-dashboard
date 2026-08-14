@@ -5,6 +5,10 @@ interface ExecutionContext { waitUntil(promise: Promise<unknown>): void; passThr
 
 export default {
   fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    const url = new URL(request.url);
+    if (url.pathname === "/") {
+      return Response.redirect(url.origin + "/field-manual/index.html", 302);
+    }
     return handler.fetch(request, env, ctx);
   },
 };
