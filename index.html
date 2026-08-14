@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="A local-first field manual for mastering n8n through high-value automation projects." />
+    <title>Signal House — n8n Mastery Field Manual</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="scanlines" aria-hidden="true"></div>
+    <header class="masthead" id="top">
+      <a class="wordmark" href="#top"><span class="sigil">S</span><span>Signal House</span></a>
+      <p class="masthead-note">n8n mastery field manual <span class="status-light"></span> local-first</p>
+      <button class="reset-button" id="resetButton" type="button">Reset progress ↺</button>
+    </header>
+
+    <main>
+      <section class="hero section-width">
+        <p class="kicker">A serious path from webhook to systems operator</p>
+        <h1>Build systems<br />that <em>survive reality.</em></h1>
+        <div class="hero-bottom">
+          <p>One main project at a time. Fast daily builds. No passing a project until its failures are boring.</p>
+          <a class="jump-link" href="#mission">Open current mission <span>↓</span></a>
+        </div>
+      </section>
+
+      <section class="status-rack section-width" aria-label="Mastery progress">
+        <article><span>Current mission</span><strong id="currentNumber">01</strong><small id="currentLabel">Webhook Command Center</small></article>
+        <article><span>Field progress</span><strong id="progressNumber">0%</strong><div class="meter"><i id="progressMeter"></i></div></article>
+        <article><span>Cadence</span><strong>10h</strong><small>build · break · repair · record</small></article>
+        <article><span>Portfolio signal</span><strong id="portfolioSignal">Setup</strong><small id="portfolioDetail">First working demo unlocks content</small></article>
+      </section>
+
+      <section class="mission section-width" id="mission" aria-labelledby="missionTitle">
+        <div class="section-label"><span>01</span><p>Current mission</p></div>
+        <div id="missionContent"></div>
+      </section>
+
+      <section class="roadmap section-width" id="roadmap" aria-labelledby="roadmapTitle">
+        <div class="section-head">
+          <div><p class="kicker">The progression</p><h2 id="roadmapTitle">Nine projects. One operating standard.</h2></div>
+          <p>Daily micro-builds give you momentum. Mastery gates make sure speed does not become fragility.</p>
+        </div>
+        <div class="roadmap-legend"><span><i class="legend-dot active"></i> active</span><span><i class="legend-dot ready"></i> completed</span><span><i class="legend-dot locked"></i> upcoming</span></div>
+        <div class="project-map" id="projectMap"></div>
+      </section>
+
+      <section class="foundation section-width" id="fundamentals" aria-labelledby="foundationTitle">
+        <div class="section-head"><div><p class="kicker">The foundation</p><h2 id="foundationTitle">Learn code only when the system demands it.</h2></div></div>
+        <div class="foundation-grid" id="foundationGrid"></div>
+      </section>
+
+      <section class="value-map section-width" id="value" aria-labelledby="valueTitle">
+        <div class="section-head"><div><p class="kicker">Where the money is</p><h2 id="valueTitle">Build close to revenue, risk, and operations.</h2></div><p>High-value automation has volume, structured data, clear ROI, multiple handoffs, and an available API.</p></div>
+        <div class="value-grid" id="valueGrid"></div>
+      </section>
+
+      <section class="not-now section-width" aria-labelledby="notNowTitle">
+        <div class="section-label"><span>!</span><p>Preserve focus</p></div>
+        <div><h2 id="notNowTitle">Do not waste time here—yet.</h2><p>These are not bad skills. They are simply not the blocker between you and high-value automation work.</p></div>
+        <ul><li>Kubernetes</li><li>GraphQL</li><li>Browser scraping</li><li>Complex React state</li><li>Fine-tuning</li><li>Regulated data</li></ul>
+      </section>
+    </main>
+
+    <footer class="footer section-width"><p>Signal House / private learning system</p><p>Progress is stored only in this browser.</p></footer>
+
+    <dialog class="reset-dialog" id="resetDialog" aria-labelledby="resetTitle">
+      <form method="dialog">
+        <p class="kicker">Clear local state</p><h2 id="resetTitle">Start the field manual over?</h2>
+        <p>This only clears your browser’s project, drill, and test progress. It does not delete files or touch any automation.</p>
+        <div class="dialog-actions"><button value="cancel" class="ghost-button">Keep progress</button><button value="confirm" class="danger-button">Reset everything</button></div>
+      </form>
+    </dialog>
+    <script src="roadmap-data.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
